@@ -13,7 +13,7 @@ $gender = 'f';
 $userGender =  $gender == 'm' ? 'male' : 'female';
 
 # null operator
-$code = 123456;
+// $code = 123456;
 
 // if($code == null){
 //     echo "no code";
@@ -23,5 +23,5 @@ $code = 123456;
 //     echo "no code";
 // }
 
-// echo $code ?? "no code";
-
+echo $code ?? "no code";
+// 
