@@ -60,6 +60,10 @@ $categories = [
     ]
 ];
 # NOTE 10 made in china , germany
+echo "{$categories['subCategories']['samsung'][0]->name} made in 
+{$categories['subCategories']['samsung'][0]->madeIn[0]} , {$categories['subCategories']['samsung'][0]->madeIn[1]}";
 
 # iphone 12 colors red , blue
-
+echo "{$categories['subCategories']['apple'][1]->name} 
+colors {$categories['subCategories']['apple'][1]->colors[1]->secondaryColors[0]} , 
+{$categories['subCategories']['apple'][1]->colors[1]->secondaryColors[1]}";
