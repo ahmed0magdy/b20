@@ -41,8 +41,7 @@ class User {
         echo static::logout();
         echo "<br>";
 
-        /// what is the difference between static & self in php ?
-        // what magic constants in php ? 
+       
     }
 }
 
