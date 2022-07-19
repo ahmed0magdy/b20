@@ -1,0 +1,15 @@
+# highest 
+
+1. difference between self vs static
+2. difference between absolute path & relative path 
+3. json 
+4. what is api 
+5. psr-4
+
+
+# lowest
+
+1. SOLID principles
+2. KISS principles
+3. DRY principles
+4. dependancey injection & dependency inversion 
