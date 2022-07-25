@@ -71,15 +71,27 @@
                                  </ul>
                              </nav>
                          </div>
-                         <div class="header-currency">
-                             <span class="digit">Welcome <i class="ti-angle-down"></i></span>
-                             <div class="dollar-submenu">
-                                 <ul>
-                                     <li><a href="login.php">Login</a></li>
-                                     <li><a href="register.php">Register</a></li>
-                                 </ul>
-                             </div>
-                         </div>
+                         <?php if (isset($_SESSION['user'])) { ?>
+                                 <div class="header-currency">
+                                     <span class="digit"><?= ucwords($_SESSION['user']->first_name . ' ' . $_SESSION['user']->last_name) ?> <i class="ti-angle-down"></i></span>
+                                     <div class="dollar-submenu">
+                                         <ul>
+                                             <li><a href="profile.php">Profile</a></li>
+                                             <li><a href="logout.php">Logout</a></li>
+                                         </ul>
+                                     </div>
+                                 </div>
+                             <?php } else { ?>
+                                 <div class="header-currency">
+                                     <span class="digit">Welcome <i class="ti-angle-down"></i></span>
+                                     <div class="dollar-submenu">
+                                         <ul>
+                                             <li><a href="login.php">Login</a></li>
+                                             <li><a href="register.php">Register</a></li>
+                                         </ul>
+                                     </div>
+                                 </div>
+                             <?php }  ?>
                          <div class="header-cart">
                              <a href="#">
                                  <div class="cart-icon">
@@ -179,15 +191,27 @@
                                  </ul>
                              </li>
                              <li><a href="contact.php"> Contact us </a></li>
-                             <div class="header-currency">
-                                 <span class="digit">Welcome <i class="ti-angle-down"></i></span>
-                                 <div class="dollar-submenu">
-                                     <ul>
-                                         <li><a href="login.php">Login</a></li>
-                                         <li><a href="register.php">Register</a></li>
-                                     </ul>
+                             <?php if (isset($_SESSION['user'])) { ?>
+                                 <div class="header-currency">
+                                     <span class="digit"><?= ucwords($_SESSION['user']->first_name . ' ' . $_SESSION['user']->last_name) ?> <i class="ti-angle-down"></i></span>
+                                     <div class="dollar-submenu">
+                                         <ul>
+                                             <li><a href="profile.php">Profile</a></li>
+                                             <li><a href="logout.php">Logout</a></li>
+                                         </ul>
+                                     </div>
                                  </div>
-                             </div>
+                             <?php } else { ?>
+                                 <div class="header-currency">
+                                     <span class="digit">Welcome <i class="ti-angle-down"></i></span>
+                                     <div class="dollar-submenu">
+                                         <ul>
+                                             <li><a href="login.php">Login</a></li>
+                                             <li><a href="register.php">Register</a></li>
+                                         </ul>
+                                     </div>
+                                 </div>
+                             <?php }  ?>
                          </ul>
                      </nav>
                  </div>

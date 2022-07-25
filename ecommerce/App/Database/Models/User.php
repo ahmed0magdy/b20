@@ -122,7 +122,7 @@ class User extends Model implements Crud{
      */ 
     public function setPassword($password)
     {
-        $this->password = $password;
+        $this->password = password_hash($password,PASSWORD_BCRYPT);
 
         return $this;
     }
@@ -247,9 +247,17 @@ class User extends Model implements Crud{
         return $this;
     }
 
-    public function create()
+    public function create() :bool
     {
-        # code...
+       $query = "INSERT INTO ".self::TABLE . " (first_name,last_name,phone,email,password,gender,verification_code) 
+       VALUES ( ? , ? , ? , ? , ? , ? , ?)" ;
+       $stmt = $this->con->prepare($query);
+       if(! $stmt){
+            return false;
+       }    
+       $bind = $stmt->bind_param("ssssssi",$this->first_name,$this->last_name,$this->phone
+       ,$this->email,$this->password,$this->gender,$this->verification_code);
+       return $stmt->execute();
     }
     public function update()
     {
@@ -264,6 +272,43 @@ class User extends Model implements Crud{
     public function delete()
     {
         # code...
+    }
+
+    public function checkCode()
+    {
+        $query = "SELECT * FROM " . self::TABLE . " WHERE email = ? AND verification_code = ?";
+        $stmt = $this->con->prepare($query);
+        if(! $stmt){
+            return false;
+        } 
+        $stmt->bind_param('si',$this->email,$this->verification_code);
+        $stmt->execute();
+        return $stmt->get_result();
+    }
+
+    public function getUserByEmail()
+    {
+        $query = "SELECT * FROM " . self::TABLE . " WHERE email = ? ";
+        $stmt = $this->con->prepare($query);
+        if(! $stmt){
+            return false;
+        } 
+        $stmt->bind_param('s',$this->email);
+        $stmt->execute();
+        return $stmt->get_result();
+    }
+
+    
+
+    public function emailVerification() :bool
+    {
+        $query = "UPDATE ". self::TABLE . " SET `email_verified_at` = ? WHERE email = ?";
+        $stmt = $this->con->prepare($query);
+        if(! $stmt){
+            return false;
+        } 
+        $stmt->bind_param('ss',$this->email_verified_at,$this->email);
+        return $stmt->execute();
     }
 }
 

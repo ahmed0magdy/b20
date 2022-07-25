@@ -1,4 +1,5 @@
 <?php
+
 $title = "Ecommerce";
 include "layouts/header.php";
 include "layouts/navbar.php";
