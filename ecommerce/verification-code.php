@@ -5,13 +5,19 @@ use App\Http\Requests\Validation;
 
 $title = "Verify Your Account";
 include "layouts/header.php";
-// submit form
+include "App/Http/Middlewares/EmailChecker.php";
 $validation = new Validation;
+// page validation
+$validation->setValueName('page')->setValue($_GET['page'] ?? null)->required()->in(['login','register','forget']);
+if($validation->getErrors()){
+     header("location:layouts/errors/404.php");die;
+}
+// submit form
 if ($_SERVER['REQUEST_METHOD'] == "POST" &&  $_POST) {
     // $_POST
     // validation
     $validation->setValueName('verification code')->setValue($_POST['verification_code'])->
-    required()->regex('/^[0-9]{6}$/')->exists('users','verification_code');
+    required()->regex( $_GET['page'] == 'forget' ? '/^[0-9]{5}$/' : '/^[0-9]{6}$/')->exists('users','verification_code');
     if (empty($validation->getErrors())) {
        $user = new User;
        $user->setEmail($_SESSION['verification_email'])->setVerification_code($_POST['verification_code']);
@@ -19,10 +25,16 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" &&  $_POST) {
        if($result->num_rows == 1){
             $user->setEmail_verified_at(date('Y-m-d H:i:s'));
             if($user->emailVerification()){
-                $success = "<div class='alert alert-success text-center'> Correct code you will be redirected to home page shortly .. </div>";
-                $_SESSION['user'] = $result->fetch_object();
-                unset($_SESSION['verification_email']);
-                header('refresh:5;url=index.php');
+                if($_GET['page'] == 'register' || $_GET['page'] == 'login'){
+                    $success = "<div class='alert alert-success text-center'> Correct code you will be redirected to home page shortly .. </div>";
+                    $_SESSION['user'] = $result->fetch_object();
+                    unset($_SESSION['verification_email']);
+                    header('refresh:5;url=index.php');
+                }elseif($_GET['page'] == 'forget'){
+                    $success = "<div class='alert alert-success text-center'> Correct code you will be redirected to change your password .. </div>";
+                    header('refresh:5;url=set-new-password.php');
+                }
+                
             }else{
                 $error = "<div class='alert alert-danger text-center'> Something Went Wrong </div>";
             }

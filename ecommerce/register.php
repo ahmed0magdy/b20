@@ -2,6 +2,7 @@
 
 use App\Database\Models\User;
 use App\Http\Requests\Validation;
+use App\Mails\VerificationCodeMail;
 
 $title = "Register";
 include "layouts/header.php";
@@ -37,8 +38,18 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" &&  $_POST) {
 
         if($user->create()){
             // send mail
-            $_SESSION['verification_email'] = $_POST['email'];
-            header('location:verification-code.php');die; //get
+            $subject = "Verification Code";
+            $body = "<p> Dear {$_POST['first_name']} {$_POST['last_name']}</p>
+            <p>Your Verification Code:<b style='color:blue'>{$verification_code}</b></p>
+            <p>Thank You</p>";
+            $verificationCodeMail = new VerificationCodeMail($_POST['email'],$subject,$body);
+            if($verificationCodeMail->send()){
+                $_SESSION['verification_email'] = $_POST['email'];
+                header('location:verification-code.php?page=register');die; //get
+            }else{
+                $error = "<div class='alert alert-danger text-center'> Please Try Again Later </div>";
+            }
+            
         }else{
             $error = "<div class='alert alert-danger text-center'> Something Went Wrong </div>";
         }

@@ -3,7 +3,7 @@ namespace App\Database\Models;
 use App\Database\Models\Contracts\Crud;
 
 class User extends Model implements Crud{
-    private $id,$first_name,$last_name,$phone,$email,$password,$gender,$verification_code,
+    private $id,$first_name,$last_name,$phone,$email,$password,$image,$gender,$verification_code,
     $status,$email_verified_at,$created_at,$updated_at;
     const TABLE = "users";
 
@@ -261,7 +261,13 @@ class User extends Model implements Crud{
     }
     public function update()
     {
-        # code...
+        $query = "UPDATE ". self::TABLE . " SET first_name = ? , last_name = ? , gender = ? WHERE email = ?";
+        $stmt = $this->con->prepare($query);
+        if(! $stmt){
+            return false;
+        } 
+        $stmt->bind_param('ssss',$this->first_name,$this->last_name,$this->gender,$this->email);
+        return $stmt->execute();
     }
 
     public function read()
@@ -309,6 +315,61 @@ class User extends Model implements Crud{
         } 
         $stmt->bind_param('ss',$this->email_verified_at,$this->email);
         return $stmt->execute();
+    }
+
+    public function updateCode() :bool
+    {
+        $query = "UPDATE ". self::TABLE . " SET `verification_code` = ? WHERE email = ?";
+        $stmt = $this->con->prepare($query);
+        if(! $stmt){
+            return false;
+        } 
+        $stmt->bind_param('is',$this->verification_code,$this->email);
+        return $stmt->execute();
+    }
+
+    public function changePassword() :bool
+    {
+        $query = "UPDATE ". self::TABLE . " SET `password` = ? WHERE email = ?";
+        $stmt = $this->con->prepare($query);
+        if(! $stmt){
+            return false;
+        } 
+        $stmt->bind_param('ss',$this->password,$this->email);
+        return $stmt->execute();
+    }
+
+    public function updateProfilePic() :bool
+    {
+        $query = "UPDATE ". self::TABLE . " SET `image` = ? WHERE email = ?";
+        $stmt = $this->con->prepare($query);
+        if(! $stmt){
+            return false;
+        } 
+        $stmt->bind_param('ss',$this->image,$this->email);
+        return $stmt->execute();
+    }
+
+    
+
+    /**
+     * Get the value of image
+     */ 
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    /**
+     * Set the value of image
+     *
+     * @return  self
+     */ 
+    public function setImage($image)
+    {
+        $this->image = $image;
+
+        return $this;
     }
 }
 
