@@ -5,7 +5,7 @@ use App\Database\Models\Contracts\Crud;
 class Product Extends Model implements Crud {
     private $id,$name_en,$name_ar,$details_en,$details_ar,$price,$quantity,
     $image,$code,$brand_id,$subcategory_id,$status,$created_at,$updated_at;
-    const TABLE = "products";
+    const TABLE = "products_details";
 
     /**
      * Get the value of id
@@ -304,5 +304,46 @@ class Product Extends Model implements Crud {
     public function delete()
     {
         # code...
+    }
+
+    public function specs()
+    {
+        $query = "SELECT `specs`.`name` , `products_specs`.`value` , `products_specs`.`product_id`
+                    FROM `specs`
+                JOIN `products_specs`
+                ON `specs`.`id` = `products_specs`.`spec_id`
+                WHERE `products_specs`.`product_id` = ?";
+        $stmt = $this->con->prepare($query);
+        if(! $stmt){
+            return false;
+        }
+        $stmt->bind_param('i',$this->id);
+        $stmt->execute();
+        return $stmt->get_result();
+    }
+
+    public function reviews()
+    {
+        $query = "SELECT
+                    `reviews`.`rate`,
+                    `reviews`.`comment`,
+                    `reviews`.`created_at`,
+                    CONCAT(
+                        `users`.`first_name`,
+                        ' ',
+                        `users`.`last_name`
+                    ) AS `full_name`
+                FROM
+                    `reviews`
+                LEFT JOIN `users`
+                ON `users`.`id` = `reviews`.`user_id`
+                WHERE `reviews`.`product_id` = ?";
+        $stmt = $this->con->prepare($query);
+        if(! $stmt){
+            return false;
+        }
+        $stmt->bind_param('i',$this->id);
+        $stmt->execute();
+        return $stmt->get_result();
     }
 }

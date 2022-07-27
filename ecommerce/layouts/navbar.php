@@ -1,3 +1,13 @@
+ <?php
+
+    use App\Database\Models\Category;
+    use App\Database\Models\Subcategory;
+
+    $categoryObject = new Category;
+    $categories = $categoryObject->all(['id', 'name_en'])->fetch_all(MYSQLI_ASSOC);
+    $subcategoryObject = new Subcategory;
+
+    ?>
  <!-- header start -->
  <header class="header-area gray-bg clearfix">
      <div class="header-bottom">
@@ -20,50 +30,22 @@
 
                                      <li class="mega-menu-position top-hover"><a href="shop.php">shop</a>
                                          <ul class="mega-menu">
-                                             <li>
-                                                 <ul>
-                                                     <li class="mega-menu-title">Categories 01</li>
-                                                     <li><a href="shop.php">Aconite</a></li>
-                                                     <li><a href="shop.php">Ageratum</a></li>
-                                                     <li><a href="shop.php">Allium</a></li>
-                                                     <li><a href="shop.php">Anemone</a></li>
-                                                     <li><a href="shop.php">Angelica</a></li>
-                                                     <li><a href="shop.php">Angelonia</a></li>
-                                                 </ul>
-                                             </li>
-                                             <li>
-                                                 <ul>
-                                                     <li class="mega-menu-title">Categories 02</li>
-                                                     <li><a href="shop.php">Balsam</a></li>
-                                                     <li><a href="shop.php">Baneberry</a></li>
-                                                     <li><a href="shop.php">Bee Balm</a></li>
-                                                     <li><a href="shop.php">Begonia</a></li>
-                                                     <li><a href="shop.php">Bellflower</a></li>
-                                                     <li><a href="shop.php">Bergenia</a></li>
-                                                 </ul>
-                                             </li>
-                                             <li>
-                                                 <ul>
-                                                     <li class="mega-menu-title">Categories 03</li>
-                                                     <li><a href="shop.php">Caladium</a></li>
-                                                     <li><a href="shop.php">Calendula</a></li>
-                                                     <li><a href="shop.php">Carnation</a></li>
-                                                     <li><a href="shop.php">Catmint</a></li>
-                                                     <li><a href="shop.php">Celosia</a></li>
-                                                     <li><a href="shop.php">Chives</a></li>
-                                                 </ul>
-                                             </li>
-                                             <li>
-                                                 <ul>
-                                                     <li class="mega-menu-title">Categories 04</li>
-                                                     <li><a href="shop.php">Daffodil</a></li>
-                                                     <li><a href="shop.php">Dahlia</a></li>
-                                                     <li><a href="shop.php">Daisy</a></li>
-                                                     <li><a href="shop.php">Diascia</a></li>
-                                                     <li><a href="shop.php">Dusty Miller</a></li>
-                                                     <li><a href="shop.php">Dame’s Rocket</a></li>
-                                                 </ul>
-                                             </li>
+
+                                             <?php foreach ($categories as $category) { ?>
+                                                 <li>
+                                                     <ul>
+                                                         <li class="mega-menu-title">
+                                                             <a class="font-weight-bold" href="shop.php?category=<?= $category['id'] ?>"><?= $category['name_en'] ?></a>
+                                                         </li>
+                                                         <?php
+                                                            $subcategoryObject->setCategory_id($category['id']);
+                                                            $subcategories = $subcategoryObject->getSubsByCat()->fetch_all(MYSQLI_ASSOC);
+                                                            foreach ($subcategories as $subcategory) { ?>
+                                                             <li><a href="shop.php?subcategory=<?= $subcategory['id'] ?>"><?= $subcategory['name_en'] ?></a></li>
+                                                         <?php } ?>
+                                                     </ul>
+                                                 </li>
+                                             <?php } ?>
                                          </ul>
                                      </li>
                                      <li><a href="about-us.php">about</a></li>
@@ -72,26 +54,26 @@
                              </nav>
                          </div>
                          <?php if (isset($_SESSION['user'])) { ?>
-                                 <div class="header-currency">
-                                     <span class="digit"><?= ucwords($_SESSION['user']->first_name . ' ' . $_SESSION['user']->last_name) ?> <i class="ti-angle-down"></i></span>
-                                     <div class="dollar-submenu">
-                                         <ul>
-                                             <li><a href="profile.php">Profile</a></li>
-                                             <li><a href="logout.php">Logout</a></li>
-                                         </ul>
-                                     </div>
+                             <div class="header-currency">
+                                 <span class="digit"><?= ucwords($_SESSION['user']->first_name . ' ' . $_SESSION['user']->last_name) ?> <i class="ti-angle-down"></i></span>
+                                 <div class="dollar-submenu">
+                                     <ul>
+                                         <li><a href="profile.php">Profile</a></li>
+                                         <li><a href="logout.php">Logout</a></li>
+                                     </ul>
                                  </div>
-                             <?php } else { ?>
-                                 <div class="header-currency">
-                                     <span class="digit">Welcome <i class="ti-angle-down"></i></span>
-                                     <div class="dollar-submenu">
-                                         <ul>
-                                             <li><a href="login.php">Login</a></li>
-                                             <li><a href="register.php">Register</a></li>
-                                         </ul>
-                                     </div>
+                             </div>
+                         <?php } else { ?>
+                             <div class="header-currency">
+                                 <span class="digit">Welcome <i class="ti-angle-down"></i></span>
+                                 <div class="dollar-submenu">
+                                     <ul>
+                                         <li><a href="login.php">Login</a></li>
+                                         <li><a href="register.php">Register</a></li>
+                                     </ul>
                                  </div>
-                             <?php }  ?>
+                             </div>
+                         <?php }  ?>
                          <div class="header-cart">
                              <a href="#">
                                  <div class="cart-icon">

@@ -5,12 +5,32 @@ use App\Database\Config\Connection;
 
 class Model extends Connection {
     const TABLE = '';
-    public static function all()
+    public function all(array $columns = ['*'],array $filters = [])
     {
-        $query = "SELECT * FROM " . static::TABLE;
+        $select = implode(', ',$columns);
+        $query = "SELECT {$select} FROM " . static::TABLE;
+        if(!empty($filters)){
+            $query .= " WHERE";
+            foreach($filters AS $index => $filter){
+                if($index != 0){
+                    $query .= " AND ";
+                }
+                $query .= " {$filter[0]} {$filter[1]} {$filter[2]}";
+            }
+        }
+        return $this->con->query($query);
     }
-    public static function find(int $id)
+    public function find(int $id)
     {
-        $query = "SELECT * FROM " . static::TABLE . " WHERE id = {$id}";
+        $query = "SELECT * FROM " . static::TABLE . " WHERE id = ?";
+        $stmt = $this->con->prepare($query);
+        if(! $stmt){
+            return false;
+        }
+        $stmt->bind_param('i',$id);
+        $stmt->execute();
+        return $stmt->get_result();
     }
+
+
 }
