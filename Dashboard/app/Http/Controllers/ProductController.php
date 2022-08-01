@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
+use App\Http\Services\Media;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 
 class ProductController extends Controller
 {
@@ -20,44 +24,37 @@ class ProductController extends Controller
         return view('products.create',compact('brands','subcategories'));
     }
 
-    public function edit($id)
+    public function edit(Product $product)
     {
-        $product = DB::table('products')->where('id',$id)->first();
-        // validation
         $brands = DB::table('brands')->select('id','name_en')->orderBy('name_en')->get();
         $subcategories = DB::table('subcategories')->select('id','name_en')->orderBy('name_en')->get();
         return view('products.edit',compact('brands','subcategories','product'));
     }
 
-    public function store(Request $request)
+    public function store(StoreProductRequest $request)
     {
-        // validation
-        $request->validate([
-            'name_en'=>['required','string','max:255'],
-            'name_ar'=>['required','string','max:255'],
-            'price'=>['required','numeric','between:1,999999.99'],
-            'quantity'=>['nullable','integer','between:1,999'],
-            'code'=>['required','integer','between:1,999999','unique:products'],
-            'status'=>['required','in:0,1'],
-            'brand_id'=>['nullable','integer','exists:brands,id'],
-            'subcategory_id'=>['required','integer','exists:subcategories,id'],
-            'details_en'=>['required','string'],
-            'details_ar'=>['required','string'],
-            'image'=>['required','max:1000','mimes:jpg,png,jpeg']
-        ]);
-        // upload image
-        $newImageName = $request->file('image')->hashName(); //generate hash name for image
-        $request->file('image')->move(public_path('images\products'),$newImageName);
-        // insert into database
+        $newImageName = Media::upload($request->file('image'),public_path('images\products'));
         $data = $request->except('image','_token');
         $data['image'] =   $newImageName ;
-        if(DB::table('products')->insert($data)){
-            // return to all products table with success message
-            return redirect()->route('dashboard.products.index')->with('success','Product Created Successfully');
-        }else{
-            return redirect()->back()->with('error','Something Went Wrong');
-        }
+        return $this->redirectBack(DB::table('products')->insert($data));
+    }
 
+    public function update(UpdateProductRequest $request,Product $product)
+    {
+        $data = $request->except('image','_token','_method');
+        if($request->hasFile('image')){
+            $newImageName = Media::upload($request->file('image'),public_path('images\products'));
+            $data['image'] =   $newImageName;
+            Media::delete(public_path("images\products\\{$product->image}"));
+        }
+        return $this->redirectBack(DB::table('products')->where('id',$product->id)->update($data));
+    }
+
+    public function destroy(Product $product)
+    {
+        Media::delete(public_path("images\products\\{$product->image}"));
+        DB::table('products')->where('id',$product->id)->delete();
+        return redirect()->back()->with('success','Product Deleted Successfully');
     }
 }
 

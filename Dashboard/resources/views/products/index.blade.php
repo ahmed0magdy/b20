@@ -40,7 +40,11 @@
                                 <td>{{ $product->updated_at }}</td>
                                 <td>
                                     <a href="{{route('dashboard.products.edit',$product->id)}}" class="btn btn-outline-warning btn-sm"> Edit </a>
-                                    <a href="#" class="btn btn-outline-danger btn-sm"> Delete </a>
+                                    <form action="{{route('dashboard.products.destroy',$product->id)}}" method="post" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="btn btn-outline-danger btn-sm"> Delete </button>
+                                    </form>
                                 </td>
                             </tr>
                         @endforeach
