@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\BrandController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +16,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
+
+Route::post('admin/login',function(){
+    return response()->json(['success'=>true]);
 });
+
+Route::get('dashboard/products',[ProductController::class,'index']);
+Route::get('dashboard/products/create',[ProductController::class,'create']);
+Route::post('dashboard/products/store',[ProductController::class,'store']);
+Route::get('dashboard/products/{product}/edit',[ProductController::class,'edit']);
+Route::post('dashboard/products/{product}/update',[ProductController::class,'update']);
+Route::post('dashboard/products/{product}/destroy',[ProductController::class,'destroy']);
+
+
+Route::resource('brands',BrandController::class)->except('create','show');

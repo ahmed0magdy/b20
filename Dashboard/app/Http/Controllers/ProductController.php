@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Brand;
 use App\Models\Product;
+use App\Models\Subcategory;
 use App\Http\Services\Media;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,49 +13,69 @@ use App\Http\Requests\UpdateProductRequest;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = DB::table('products')->get();
+        $products = Product::all();
+        if($request->expectsJson()){
+            return response()->json(compact('products'));
+        }
         return view('products.index',compact('products'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        $brands = DB::table('brands')->select('id','name_en')->orderBy('name_en')->get();
-        $subcategories = DB::table('subcategories')->select('id','name_en')->orderBy('name_en')->get();
+        $brands = Brand::select('id','name_en')->orderBy('name_en')->get();
+        $subcategories = Subcategory::select('id','name_en')->orderBy('name_en')->get();
+        if($request->expectsJson()){
+            return response()->jsoN(compact('brands','subcategories'));
+        }
         return view('products.create',compact('brands','subcategories'));
     }
 
-    public function edit(Product $product)
+    public function edit(Product $product,Request $request)
     {
-        $brands = DB::table('brands')->select('id','name_en')->orderBy('name_en')->get();
-        $subcategories = DB::table('subcategories')->select('id','name_en')->orderBy('name_en')->get();
+        $brands = Brand::select('id','name_en')->orderBy('name_en')->get();
+        $subcategories = Subcategory::select('id','name_en')->orderBy('name_en')->get();
+        if($request->expectsJson()){
+            return response()->jsoN(compact('brands','subcategories','product'));
+        }
         return view('products.edit',compact('brands','subcategories','product'));
     }
 
     public function store(StoreProductRequest $request)
     {
-        $newImageName = Media::upload($request->file('image'),public_path('images\products'));
+        $newImageName = Media::upload($request->file('image'),'images\products');
         $data = $request->except('image','_token');
         $data['image'] =   $newImageName ;
-        return $this->redirectBack(DB::table('products')->insert($data));
+        $status = Product::create($data);
+        if($request->expectsJson()){
+            return response()->jsoN(['success'=>true,'message'=>'successfull operation']);
+        }
+        return $this->redirectBack($status);
     }
 
     public function update(UpdateProductRequest $request,Product $product)
     {
         $data = $request->except('image','_token','_method');
         if($request->hasFile('image')){
-            $newImageName = Media::upload($request->file('image'),public_path('images\products'));
+            $newImageName = Media::upload($request->file('image'),'images\products');
             $data['image'] =   $newImageName;
             Media::delete(public_path("images\products\\{$product->image}"));
         }
-        return $this->redirectBack(DB::table('products')->where('id',$product->id)->update($data));
+        $status = $product->update($data);
+        if($request->expectsJson()){
+            return response()->jsoN(['success'=>'true','msg'=>'successfull operation']);
+        }
+        return $this->redirectBack($status);
     }
 
-    public function destroy(Product $product)
+    public function destroy(Product $product,Request $request)
     {
         Media::delete(public_path("images\products\\{$product->image}"));
-        DB::table('products')->where('id',$product->id)->delete();
+        $product->delete();
+        if($request->expectsJson()){
+            return response()->jsoN(['success'=>true,'message'=>'successfull operation']);
+        }
         return redirect()->back()->with('success','Product Deleted Successfully');
     }
 }
