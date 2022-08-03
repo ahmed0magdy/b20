@@ -10,12 +10,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
+use Illuminate\Support\Facades\App;
 
 class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $products = Product::all();
+
+        $products = Product::select('id','name_'.App::currentLocale(). ' AS name','details_' . App::currentLocale() . ' AS details')->get();
         if($request->expectsJson()){
             return response()->json(compact('products'));
         }

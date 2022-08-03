@@ -41,6 +41,6 @@ Route::prefix('dashboard')->middleware('verified')->name('dashboard')->group(fun
     });
 });
 
-Auth::routes(['verify' => true,'register'=>false]);
+Auth::routes(['verify' => true]);
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

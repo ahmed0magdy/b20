@@ -23,7 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" &&  $_POST) {
     ->regex("/^01[0125][0-9]{8}$/")->unique('users','phone');
     $validation->setValueName('password')->setValue($_POST['password'])->required()
     ->regex("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,32}$/",
-    "Minimum eight and maximum 32 characters, at least one uppercase letter, one lowercase letter, one number and one special character.")->confirmed($_POST['password_confirmation']);
+    "Minimum eight and maximum 32 characters, at least one uppercase letter, one lowercase letter,
+     one number and one special character.")->confirmed($_POST['password_confirmation']);
     $validation->setValueName('password confirmation')->setValue($_POST['password_confirmation'])->required();
     $validation->setValueName('gender')->setValue($_POST['gender'])->required()->in(['m', 'f']);
     if (empty($validation->getErrors())) {
